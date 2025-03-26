@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class MainController {
-  @GetMapping
-  public String testApi() {
-    return "Hello Spring!";
-  }
+    @GetMapping
+    public String testApi() {
+        return "Hello Spring!";
+    }
 }
