@@ -3,9 +3,11 @@ package ru.hogwarts.school.service;
 
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repositories.FacultyRepository;
 
 import java.util.Collection;
+import java.util.Collections;
 
 @Service
 public class FacultyService {
@@ -38,9 +40,21 @@ public class FacultyService {
 
     public Collection<Faculty> getAllFacultiesByColor(String color) {
         return facultyRepository.findAll()
-         .stream()
-         .filter(faculty -> faculty.getColor().equals(color))
-         .toList();
+                .stream()
+                .filter(faculty -> faculty.getColor().equals(color))
+                .toList();
     }
+
+    public Collection<Faculty> getAllFacultiesByNameOrColor(String query) {
+        return facultyRepository.findByNameIgnoreCaseContainingOrColorIgnoreCaseContaining(query, query);
+    }
+
+    public Collection<Student> getAllStudentsInFaculty(Long facultyId) {
+        return facultyRepository
+                .findById(facultyId)
+                .map(Faculty::getStudents)
+                .orElse(Collections.emptyList());
+    }
+
 }
 
