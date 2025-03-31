@@ -28,6 +28,15 @@ public class Student {
     @JsonBackReference
     private Faculty faculty;
 
+    @OneToOne
+    @JoinColumn(name = "avatar_id")
+    @JsonBackReference
+    private Avatar avatar;
+
+    public Avatar getAvatar() {
+        return avatar;
+    }
+
     public Faculty getFaculty() {
         return faculty;
     }
@@ -63,10 +72,10 @@ public class Student {
     @Override
     public String toString() {
         return "Student{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", age=" + age +
-                '}';
+         "id=" + id +
+         ", name='" + name + '\'' +
+         ", age=" + age +
+         '}';
     }
 
     @Override

@@ -40,9 +40,9 @@ public class FacultyService {
 
     public Collection<Faculty> getAllFacultiesByColor(String color) {
         return facultyRepository.findAll()
-                .stream()
-                .filter(faculty -> faculty.getColor().equals(color))
-                .toList();
+         .stream()
+         .filter(faculty -> faculty.getColor().equals(color))
+         .toList();
     }
 
     public Collection<Faculty> getAllFacultiesByNameOrColor(String query) {
@@ -51,9 +51,9 @@ public class FacultyService {
 
     public Collection<Student> getAllStudentsInFaculty(Long facultyId) {
         return facultyRepository
-                .findById(facultyId)
-                .map(Faculty::getStudents)
-                .orElse(Collections.emptyList());
+         .findById(facultyId)
+         .map(Faculty::getStudents)
+         .orElse(Collections.emptyList());
     }
 
 }
