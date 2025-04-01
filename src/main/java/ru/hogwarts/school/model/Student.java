@@ -1,19 +1,33 @@
 package ru.hogwarts.school.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.Objects;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private String name;
     private int age;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "faculty_id")
+    @JsonIgnore
+    private Faculty faculty;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn (name = "avatar_id")
+    @JsonIgnore
+    private Avatar avatar;
 
     public Student() {
     }
@@ -23,16 +37,6 @@ public class Student {
         this.age = age;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "faculty_id")
-    @JsonBackReference
-    private Faculty faculty;
-
-    @OneToOne
-    @JoinColumn(name = "avatar_id")
-    @JsonBackReference
-    private Avatar avatar;
-
     public Avatar getAvatar() {
         return avatar;
     }
@@ -41,11 +45,15 @@ public class Student {
         return faculty;
     }
 
+    public void setAvatar(Avatar avatar) {
+        this.avatar = avatar;
+    }
+
     public void setFaculty(Faculty faculty) {
         this.faculty = faculty;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
@@ -57,7 +65,7 @@ public class Student {
         return age;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
