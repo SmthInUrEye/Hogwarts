@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
-
+@Transactional
 @Service
 public class AvatarService {
     private final AvatarRepository avatarRepository;
@@ -39,10 +39,10 @@ public class AvatarService {
         Files.deleteIfExists(filePath);
 
         try (
-         InputStream is = file.getInputStream();
-         OutputStream os = Files.newOutputStream(filePath, CREATE_NEW);
-         BufferedInputStream bis = new BufferedInputStream(is, 1024);
-         BufferedOutputStream bos = new BufferedOutputStream(os, 1024);
+          InputStream is = file.getInputStream();
+          OutputStream os = Files.newOutputStream(filePath, CREATE_NEW);
+          BufferedInputStream bis = new BufferedInputStream(is, 1024);
+          BufferedOutputStream bos = new BufferedOutputStream(os, 1024);
         ) {
             bis.transferTo(bos);
         }
@@ -53,6 +53,7 @@ public class AvatarService {
         avatar.setMediaType(file.getContentType());
         avatar.setFileSize(file.getSize());
         avatar.setData(file.getBytes());
+        avatar.setStudent(student);
 
         return avatarRepository.save(avatar);
     }

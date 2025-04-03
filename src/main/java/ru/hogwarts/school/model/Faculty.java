@@ -9,8 +9,8 @@ import jakarta.persistence.*;
 import java.util.Collection;
 import java.util.Objects;
 
-@Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Entity
 public class Faculty {
 
     @Id
@@ -75,9 +75,9 @@ public class Faculty {
     @Override
     public String toString() {
         return "Faculty{" +
-         "id=" + id +
-         ", name='" + name + '\'' +
-         ", color='" + color + '\'' +
-         '}';
+          "id=" + id +
+          ", name='" + name + '\'' +
+          ", color='" + color + '\'' +
+          '}';
     }
 }

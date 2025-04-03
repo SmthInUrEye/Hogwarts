@@ -19,12 +19,11 @@ public class Avatar {
     @Lob
     private byte[] data;
 
-    @OneToOne(mappedBy = "avatar", fetch = FetchType.LAZY)
+    @OneToOne
     @JsonIgnore
     private Student student;
 
     public Avatar(long id, String filePath, long fileSize, String mediaType, byte[] data) {
-        this.id = id;
         this.filePath = filePath;
         this.fileSize = fileSize;
         this.mediaType = mediaType;
@@ -76,6 +75,10 @@ public class Avatar {
 
     public Student getStudent() {
         return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
     }
 
 }

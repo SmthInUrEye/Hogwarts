@@ -66,11 +66,16 @@ public class StudentController {
 
     public ResponseEntity<Faculty> getStudentFaculty(@PathVariable Long id) {
         return studentService
-                .getStudentFaculty(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity
-                        .notFound()
-                        .build());
+          .getStudentFaculty(id)
+          .map(ResponseEntity::ok)
+          .orElse(ResponseEntity
+            .notFound()
+            .build());
+    }
+
+    @PutMapping("/{studentId}/assign/{facultyId}")
+    public ResponseEntity<Student> assignStudentToFaculty(@PathVariable Long studentId, @PathVariable Long facultyId) {
+        return ResponseEntity.ok(studentService.assignStudentToFaculty(studentId, facultyId));
     }
 
 }
