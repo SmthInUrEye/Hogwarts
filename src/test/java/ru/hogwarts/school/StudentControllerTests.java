@@ -194,5 +194,5 @@ class StudentControllerTests {
           .extracting(Faculty::getName)
           .isEqualTo("Грифиндор");
     }
-    
+
 }

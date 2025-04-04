@@ -25,7 +25,7 @@ public class Student {
     private Faculty faculty;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn (name = "avatar_id")
+    @JoinColumn(name = "avatar_id")
     @JsonIgnore
     private Avatar avatar;
 
@@ -80,10 +80,10 @@ public class Student {
     @Override
     public String toString() {
         return "Student{" +
-         "id=" + id +
-         ", name='" + name + '\'' +
-         ", age=" + age +
-         '}';
+          "id=" + id +
+          ", name='" + name + '\'' +
+          ", age=" + age +
+          '}';
     }
 
     @Override

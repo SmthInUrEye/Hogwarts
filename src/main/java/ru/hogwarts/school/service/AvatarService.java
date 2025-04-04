@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
-@Transactional
+
 @Service
 public class AvatarService {
     private final AvatarRepository avatarRepository;
@@ -53,7 +53,6 @@ public class AvatarService {
         avatar.setMediaType(file.getContentType());
         avatar.setFileSize(file.getSize());
         avatar.setData(file.getBytes());
-        avatar.setStudent(student);
 
         return avatarRepository.save(avatar);
     }
