@@ -1,5 +1,6 @@
 package ru.hogwarts.school.service;
 
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.hogwarts.school.model.Faculty;
@@ -12,9 +13,11 @@ import java.util.Optional;
 @Service
 public class StudentService {
 
+    private final FacultyService facultyService;
     private final StudentRepository studentRepository;
 
-    public StudentService(StudentRepository studentRepository) {
+    public StudentService(FacultyService facultyService, StudentRepository studentRepository) {
+        this.facultyService = facultyService;
         this.studentRepository = studentRepository;
     }
 
@@ -40,10 +43,10 @@ public class StudentService {
 
     public Collection<Student> getAllStudentsByAge(int age) {
         return studentRepository
-         .findAll()
-         .stream()
-         .filter(student -> student.getAge() == age)
-         .toList();
+          .findAll()
+          .stream()
+          .filter(student -> student.getAge() == age)
+          .toList();
     }
 
     public Collection<Student> getStudentsByAgeBetween(int min, int max) {
@@ -53,8 +56,18 @@ public class StudentService {
     @Transactional(readOnly = true)
     public Optional<Faculty> getStudentFaculty(Long id) {
         return studentRepository
-         .findById(id)
-         .map(Student::getFaculty);
+          .findById(id)
+          .map(Student::getFaculty);
+    }
+
+    @Transactional
+    public Student assignStudentToFaculty(Long studentId, Long facultyId) {
+        Student student = studentRepository.findById(studentId).orElseThrow(NullPointerException::new);
+
+        Faculty faculty = facultyService.findFaculty(facultyId);
+        student.setFaculty(faculty);
+
+        return studentRepository.save(student);
     }
 }
 

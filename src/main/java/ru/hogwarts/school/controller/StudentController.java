@@ -1,6 +1,7 @@
 package ru.hogwarts.school.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
@@ -65,11 +66,16 @@ public class StudentController {
 
     public ResponseEntity<Faculty> getStudentFaculty(@PathVariable Long id) {
         return studentService
-                .getStudentFaculty(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity
-                        .notFound()
-                        .build());
+          .getStudentFaculty(id)
+          .map(ResponseEntity::ok)
+          .orElse(ResponseEntity
+            .notFound()
+            .build());
+    }
+
+    @PutMapping("/{studentId}/assign/{facultyId}")
+    public ResponseEntity<Student> assignStudentToFaculty(@PathVariable Long studentId, @PathVariable Long facultyId) {
+        return ResponseEntity.ok(studentService.assignStudentToFaculty(studentId, facultyId));
     }
 
 }
