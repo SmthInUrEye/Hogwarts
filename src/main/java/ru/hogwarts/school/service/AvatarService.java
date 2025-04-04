@@ -39,10 +39,10 @@ public class AvatarService {
         Files.deleteIfExists(filePath);
 
         try (
-          InputStream is = file.getInputStream();
-          OutputStream os = Files.newOutputStream(filePath, CREATE_NEW);
-          BufferedInputStream bis = new BufferedInputStream(is, 1024);
-          BufferedOutputStream bos = new BufferedOutputStream(os, 1024);
+         InputStream is = file.getInputStream();
+         OutputStream os = Files.newOutputStream(filePath, CREATE_NEW);
+         BufferedInputStream bis = new BufferedInputStream(is, 1024);
+         BufferedOutputStream bos = new BufferedOutputStream(os, 1024);
         ) {
             bis.transferTo(bos);
         }
