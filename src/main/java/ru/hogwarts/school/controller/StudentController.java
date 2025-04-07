@@ -66,11 +66,11 @@ public class StudentController {
 
     public ResponseEntity<Faculty> getStudentFaculty(@PathVariable Long id) {
         return studentService
-          .getStudentFaculty(id)
-          .map(ResponseEntity::ok)
-          .orElse(ResponseEntity
-            .notFound()
-            .build());
+         .getStudentFaculty(id)
+         .map(ResponseEntity::ok)
+         .orElse(ResponseEntity
+          .notFound()
+          .build());
     }
 
     @PutMapping("/{studentId}/assign/{facultyId}")
@@ -78,4 +78,18 @@ public class StudentController {
         return ResponseEntity.ok(studentService.assignStudentToFaculty(studentId, facultyId));
     }
 
+    @GetMapping("/all-students-amount")
+    public ResponseEntity<Integer> getAllStudentsAmount() {
+        return ResponseEntity.ok(studentService.getAllStudentsAmount());
+    }
+
+    @GetMapping("/students-avg-age")
+    public ResponseEntity<Integer> getStudentsAverageAge() {
+        return ResponseEntity.ok(studentService.getAverageStudentsAge());
+    }
+
+    @GetMapping("/last-five-students")
+    public ResponseEntity<Collection<Student>> getLastFiveStudents() {
+        return ResponseEntity.ok(studentService.getLastFiveStudents());
+    }
 }

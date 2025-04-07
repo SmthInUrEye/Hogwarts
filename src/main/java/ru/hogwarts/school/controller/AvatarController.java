@@ -1,6 +1,7 @@
 package ru.hogwarts.school.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.hibernate.engine.spi.CollectionEntry;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +17,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class AvatarController {
@@ -54,5 +58,21 @@ public class AvatarController {
             is.transferTo(os);
         }
     }
+
+    @GetMapping(value = "/get-all")
+    public ResponseEntity<List<byte[]>> getAllAvatars(
+     @RequestParam("page") Integer pageNumber,
+     @RequestParam("size") Integer pageSize) {
+
+        List<byte[]> avatarDataList =  avatarService
+         .getAllAvatarsByPages(pageNumber, pageSize)
+         .stream()
+         .map(Avatar::getData)
+         .collect(Collectors.toList());
+
+         return ResponseEntity.ok(avatarDataList);
+    }
+
+
 
 }

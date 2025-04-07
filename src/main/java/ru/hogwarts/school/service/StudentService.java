@@ -43,10 +43,10 @@ public class StudentService {
 
     public Collection<Student> getAllStudentsByAge(int age) {
         return studentRepository
-          .findAll()
-          .stream()
-          .filter(student -> student.getAge() == age)
-          .toList();
+         .findAll()
+         .stream()
+         .filter(student -> student.getAge() == age)
+         .toList();
     }
 
     public Collection<Student> getStudentsByAgeBetween(int min, int max) {
@@ -56,8 +56,8 @@ public class StudentService {
     @Transactional(readOnly = true)
     public Optional<Faculty> getStudentFaculty(Long id) {
         return studentRepository
-          .findById(id)
-          .map(Student::getFaculty);
+         .findById(id)
+         .map(Student::getFaculty);
     }
 
     @Transactional
@@ -68,6 +68,18 @@ public class StudentService {
         student.setFaculty(faculty);
 
         return studentRepository.save(student);
+    }
+
+    public int getAllStudentsAmount() {
+        return studentRepository.getAllStudentsAmount();
+    }
+
+    public int getAverageStudentsAge() {
+        return studentRepository.getAverageStudentsAge();
+    }
+
+    public Collection<Student> getLastFiveStudents() {
+        return studentRepository.getLastFiveStudents();
     }
 }
 
