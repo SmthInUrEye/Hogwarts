@@ -18,7 +18,9 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -60,19 +62,21 @@ public class AvatarController {
     }
 
     @GetMapping(value = "/get-all")
-    public ResponseEntity<List<byte[]>> getAllAvatars(
-     @RequestParam("page") Integer pageNumber,
-     @RequestParam("size") Integer pageSize) {
+    public ResponseEntity<List<Map<String, Object>>> getAllAvatars(
+      @RequestParam("page") Integer pageNumber,
+      @RequestParam("size") Integer pageSize) {
 
-        List<byte[]> avatarDataList =  avatarService
-         .getAllAvatarsByPages(pageNumber, pageSize)
-         .stream()
-         .map(Avatar::getData)
-         .collect(Collectors.toList());
+        Collection<Avatar> avatarDataList = avatarService.getAllAvatarsByPages(pageNumber, pageSize);
 
-         return ResponseEntity.ok(avatarDataList);
+        List<Map<String, Object>> result = avatarDataList.stream().map(avatar -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", avatar.getId());
+            map.put("path", avatar.getFilePath());
+            map.put("imageUrl", "/avatars/" + avatar.getId());
+            return map;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(result);
+
     }
-
-
-
 }
