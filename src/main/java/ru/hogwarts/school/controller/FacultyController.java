@@ -61,7 +61,7 @@ public class FacultyController {
         return ResponseEntity.ok(facultyService.getAllFacultiesByNameOrColor(query));
     }
 
-    @GetMapping("/getStudents/")
+    @GetMapping("/getStudents")
     public ResponseEntity<Collection<Student>> getAllStudentsInFaculty(@RequestParam Long facultyId) {
         return ResponseEntity.ok(facultyService.getAllStudentsInFaculty(facultyId));
     }

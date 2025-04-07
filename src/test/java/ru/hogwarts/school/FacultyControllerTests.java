@@ -1,149 +1,148 @@
 package ru.hogwarts.school;
 
-import org.assertj.core.api.Assertions;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 import ru.hogwarts.school.controller.FacultyController;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repositories.FacultyRepository;
+import ru.hogwarts.school.repositories.StudentRepository;
+import ru.hogwarts.school.service.FacultyService;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Collections;
+import java.util.List;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(FacultyController.class)
 public class FacultyControllerTests {
 
-    @LocalServerPort
-    private int port;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
-    private FacultyController facultyController;
+    private ObjectMapper objectMapper;
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    @MockitoBean
+    private FacultyService facultyService;
 
-    String localhost = "http://localhost:";
+    @MockitoBean
+    private FacultyRepository facultyRepository;
 
-    @Test
-    public void contextLoads() throws Exception {
-        assertThat(facultyController).isNotNull();
-    }
+    @MockitoBean
+    private StudentRepository studentRepository;
 
     @Test
     public void testPostFaculty() throws Exception {
-        Faculty faculty = new Faculty();
-        faculty.setName("Тестировщики");
-        faculty.setColor("Green");
+        Faculty faculty = new Faculty("Тестировщики", "Green");
 
-        assertThat(this.restTemplate.postForObject(localhost + port + "/faculty", faculty, String.class))
-          .isNotNull();
+        when(facultyService.createFaculty(any(Faculty.class))).thenReturn(faculty);
+
+        mockMvc.perform(post("/faculty")
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(objectMapper.writeValueAsString(faculty)))
+         .andExpect(status().isOk())
+         .andExpect(jsonPath("$.name").value("Тестировщики"))
+         .andExpect(jsonPath("$.color").value("Green"));
     }
 
     @Test
-    public void testGetFaculties() throws Exception {
-        assertThat(this.restTemplate.getForObject(localhost + port + "/faculty", String.class))
-          .isNotNull()
-          .contains("Тестировщики", "Green");
+    public void testGetFaculty() throws Exception {
+        Faculty faculty = new Faculty("Грифиндор", "Красный");
+        faculty.setId(1L);
+
+        when(facultyService.findFaculty(1L)).thenReturn(faculty);
+
+        mockMvc.perform(get("/faculty/1"))
+         .andExpect(status().isOk())
+         .andExpect(jsonPath("$.id").value(1))
+         .andExpect(jsonPath("$.name").value("Грифиндор"))
+         .andExpect(jsonPath("$.color").value("Красный"));
     }
 
     @Test
-    public void testEditFacultyAndFacultyInfo() throws Exception {
+    public void testEditFaculty() throws Exception {
+        Faculty updatedFaculty = new Faculty("Слизерин", "Зеленый");
+        updatedFaculty.setId(1L);
 
-        Faculty originalFaculty = new Faculty("Когтеврань", "Жёлтый");
-        Faculty savedFaculty = restTemplate.postForObject(localhost + port + "/faculty", originalFaculty, Faculty.class);
+        when(facultyService.editFaculty(any(Faculty.class))).thenReturn(updatedFaculty);
 
-        Faculty updatedFaculty = new Faculty("Замена когтевраню", "Белый");
-        updatedFaculty.setId(savedFaculty.getId());
-        restTemplate.put(localhost + port + "/faculty", updatedFaculty, String.class);
-
-        Faculty result = restTemplate.getForObject(localhost + port + "/faculty/" + savedFaculty.getId(), Faculty.class);
-
-        assertThat(result)
-          .isNotNull()
-          .extracting(Faculty::getId,
-            Faculty::getName,
-            Faculty::getColor)
-          .containsExactly(savedFaculty.getId(),
-            "Замена когтевраню", "Белый");
+        mockMvc.perform(put("/faculty")
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(objectMapper.writeValueAsString(updatedFaculty)))
+         .andExpect(status().isOk())
+         .andExpect(jsonPath("$.name").value("Слизерин"))
+         .andExpect(jsonPath("$.color").value("Зеленый"));
     }
 
     @Test
     public void testDeleteFaculty() throws Exception {
-        restTemplate.delete(localhost + port + "/faculty/15");
-
-        Assertions.
-          assertThat(this.restTemplate.getForObject(localhost + port + "/faculty/15", String.class))
-          .isNullOrEmpty();
+        mockMvc.perform(delete("/faculty/1"))
+         .andExpect(status().isOk());
     }
 
     @Test
     public void testGetAllFaculties() throws Exception {
-        Faculty faculty1 = new Faculty("Слизерин", "Зеленый");
-        restTemplate.postForObject(localhost + port + "/faculty", faculty1, String.class);
+        Faculty faculty1 = new Faculty("Гриффиндор", "Красный");
+        Faculty faculty2 = new Faculty("Слизерин", "Зеленый");
+        faculty1.setId(1L);
+        faculty2.setId(2L);
 
-        Faculty faculty2 = new Faculty("Грифондий", "Салатовый");
-        restTemplate.postForObject(localhost + port + "/faculty", faculty2, String.class);
+        when(facultyService.getAllFaculties()).thenReturn(List.of(faculty1, faculty2));
 
-        Assertions
-          .assertThat(this.restTemplate.getForObject(localhost + port + "/faculty", String.class))
-          .isNotNull()
-          .contains(faculty1.getName())
-          .contains(faculty2.getName());
+        mockMvc.perform(get("/faculty"))
+         .andExpect(status().isOk())
+         .andExpect(jsonPath("$[0].name").value("Гриффиндор"))
+         .andExpect(jsonPath("$[0].color").value("Красный"))
+         .andExpect(jsonPath("$[1].name").value("Слизерин"))
+         .andExpect(jsonPath("$[1].color").value("Зеленый"));
+
     }
 
     @Test
     public void testFacultySearch() throws Exception {
-        Faculty faculty1 = new Faculty("Попробуй меня найти", "Самый насыщенный цвет");
-        restTemplate.postForObject(localhost + port + "/faculty", faculty1, String.class);
-        String searhQuery = "цвет";
+        Faculty faculty = new Faculty("Поиск", "Цвет");
+        faculty.setId(1L);
 
-        assertThat(this.restTemplate.getForObject(localhost + port + "/faculty/search?query=" + searhQuery, String.class))
-          .isNotNull()
-          .contains(faculty1.getName())
-          .contains(faculty1.getColor());
+        when(facultyService.getAllFacultiesByNameOrColor(any(String.class))).thenReturn(Collections.singletonList(faculty));
 
-    }
-
-    @Test
-    public void testFacultyColorSearch() throws Exception {
-        Faculty faculty1 = new Faculty("Факультет", "Любой");
-        restTemplate.postForObject(localhost + port + "/faculty", faculty1, String.class);
-        String searhColor = "Любой";
-
-        assertThat(this.restTemplate.getForObject(localhost + port + "/faculty/by-color?color=" + searhColor, String.class))
-          .isNotNull()
-          .contains(faculty1.getName())
-          .contains(faculty1.getColor());
-
+        mockMvc.perform(get("/faculty/search").param("query", "цвет"))
+         .andExpect(status().isOk())
+         .andExpect(jsonPath("$[0].name").value("Поиск"))
+         .andExpect(jsonPath("$[0].color").value("Цвет"));
     }
 
     @Test
     public void testGetStudentsByFacultyId() throws Exception {
-        Faculty faculty = new Faculty("Тестовый факультет", "Тестовый цвет");
-        Faculty createdFaculty = this.restTemplate.postForObject(localhost + port + "/faculty", faculty, Faculty.class);
 
-        assertThat(createdFaculty.getId()).isNotNull();
+        Faculty faculty = new Faculty("Тест", "Цвет");
+        Student student1 = new Student("Гермиона", 21);
+        Student student2 = new Student("Малфой", 29);
+        faculty.setId(1L);
+        student1.setId(1L);
+        student2.setId(2L);
 
-        Student student1 = new Student();
-        student1.setName("Гермиона");
-        student1.setAge(21);
-        Student createdStudent1 = restTemplate.postForObject(localhost + port + "/student", student1, Student.class);
+        when(facultyService.getAllStudentsInFaculty(1L)).thenReturn(List.of(student1, student2));
 
-        Student student2 = new Student();
-        student2.setName("Малфой");
-        student2.setAge(29);
-        Student createdStudent2 = restTemplate.postForObject(localhost + port + "/student", student2, Student.class);
-
-        restTemplate.put(localhost + port + "/student/" + createdStudent1.getId() + "/assign/" + createdFaculty.getId(), null);
-        restTemplate.put(localhost + port + "/student/" + createdStudent2.getId() + "/assign/" + createdFaculty.getId(), null);
-
-        assertThat(restTemplate.getForObject(localhost + port + "/faculty/getStudents/?facultyId=" + createdFaculty.getId(), String.class))
-          .isNotNull()
-          .contains(student1.getName())
-          .contains(student2.getName());
-
+        mockMvc.perform(get("/faculty/getStudents").param("facultyId", "1"))
+         .andExpect(status().isOk())
+         .andExpect(jsonPath("$[0].name").value("Гермиона"))
+         .andExpect(jsonPath("$[1].name").value("Малфой"))
+         .andExpect(jsonPath("$[0].age").value(21))
+         .andExpect(jsonPath("$[1].age").value(29));
     }
-
 }
+
+
+
+
+
