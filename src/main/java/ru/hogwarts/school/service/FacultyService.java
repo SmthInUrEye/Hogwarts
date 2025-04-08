@@ -2,6 +2,7 @@ package ru.hogwarts.school.service;
 
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repositories.FacultyRepository;
@@ -9,6 +10,7 @@ import ru.hogwarts.school.repositories.FacultyRepository;
 import java.util.Collection;
 import java.util.Collections;
 
+@Transactional
 @Service
 public class FacultyService {
 
@@ -39,10 +41,7 @@ public class FacultyService {
     }
 
     public Collection<Faculty> getAllFacultiesByColor(String color) {
-        return facultyRepository.findAll()
-         .stream()
-         .filter(faculty -> faculty.getColor().equals(color))
-         .toList();
+        return facultyRepository.findByColorIgnoreCaseContaining(color);
     }
 
     public Collection<Faculty> getAllFacultiesByNameOrColor(String query) {
@@ -51,9 +50,9 @@ public class FacultyService {
 
     public Collection<Student> getAllStudentsInFaculty(Long facultyId) {
         return facultyRepository
-         .findById(facultyId)
-         .map(Faculty::getStudents)
-         .orElse(Collections.emptyList());
+          .findById(facultyId)
+          .map(Faculty::getStudents)
+          .orElse(Collections.emptyList());
     }
 
 }
