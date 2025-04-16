@@ -1,13 +1,14 @@
 package ru.hogwarts.school.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
+import java.util.OptionalDouble;
+import java.util.stream.IntStream;
 
 @RestController
 @RequestMapping("student")
@@ -92,4 +93,22 @@ public class StudentController {
     public ResponseEntity<Collection<Student>> getLastFiveStudents() {
         return ResponseEntity.ok(studentService.getLastFiveStudents());
     }
+
+    @GetMapping("/students-with-A")
+    public ResponseEntity<Collection<Student>> getAllStudentsNameStartsWithA() {
+        return ResponseEntity.ok(studentService.getAllStudentsNameStartsWithA());
+    }
+
+    @GetMapping("/avg-students-age-double")
+    public ResponseEntity<OptionalDouble> getAverageStudentsAgeInDouble() {
+        return ResponseEntity.ok(studentService.getAverageStudentsAgeInDouble());
+    }
+
+    @GetMapping("/try-to-optim")
+    public ResponseEntity <Integer> getOptimaFormula() {
+        int sum = IntStream.rangeClosed(1, 1_000_000).parallel().sum();
+        return ResponseEntity.ok(sum);
+    }
+
+
 }

@@ -9,8 +9,8 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repositories.StudentRepository;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
@@ -59,11 +59,11 @@ public class StudentService {
         Collection<Student> allStudents;
 
         allStudents = studentRepository
-         .findAll()
-         .stream()
-         .peek(student -> logger.debug("Checking student: {}, age: {}", student.getName(), student.getAge()))
-         .filter(student -> student.getAge() == age)
-         .toList();
+          .findAll()
+          .stream()
+          .peek(student -> logger.debug("Checking student: {}, age: {}", student.getName(), student.getAge()))
+          .filter(student -> student.getAge() == age)
+          .toList();
 
         if (allStudents.isEmpty()) {
             logger.warn("No students found with age {}", age);
@@ -80,8 +80,8 @@ public class StudentService {
     public Optional<Faculty> getStudentFaculty(Long id) {
         logger.info("Was invoked method for get student faculty");
         return studentRepository
-         .findById(id)
-         .map(Student::getFaculty);
+          .findById(id)
+          .map(Student::getFaculty);
     }
 
     @Transactional
@@ -112,6 +112,25 @@ public class StudentService {
         logger.info("Was invoked method for get last 5 added students");
         return studentRepository.getLastFiveStudents();
     }
-}
 
+    public Collection<Student> getAllStudentsNameStartsWithA() {
+        List<Student> allStudents = studentRepository.findAll();
+
+        return allStudents
+          .parallelStream()
+          .filter(student -> student.getName().startsWith("А"))
+          .peek(student -> logger.debug("Filtered student: {}, age: {}", student.getName(), student.getAge()))
+          .sorted(Comparator.comparing(Student::getName))
+          .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public OptionalDouble getAverageStudentsAgeInDouble() {
+        List<Student> allStudents = studentRepository.findAll();
+
+        return allStudents
+          .parallelStream()
+          .mapToInt(Student::getAge)
+          .average();
+    }
+}
 

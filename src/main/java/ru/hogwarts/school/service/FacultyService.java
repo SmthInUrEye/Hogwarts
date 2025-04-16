@@ -7,8 +7,7 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repositories.FacultyRepository;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 @Transactional
 @Service
@@ -53,6 +52,16 @@ public class FacultyService {
           .findById(facultyId)
           .map(Faculty::getStudents)
           .orElse(Collections.emptyList());
+    }
+
+    public Optional<String> getLongestFacultyName () {
+        List<Faculty> allFaculties = facultyRepository.findAll();
+
+        return allFaculties
+          .parallelStream()
+          .map(Faculty::getName)
+          .max(Comparator.comparingInt(String::length));
+
     }
 
 }
