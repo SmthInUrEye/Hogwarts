@@ -67,11 +67,11 @@ public class StudentController {
 
     public ResponseEntity<Faculty> getStudentFaculty(@PathVariable Long id) {
         return studentService
-         .getStudentFaculty(id)
-         .map(ResponseEntity::ok)
-         .orElse(ResponseEntity
-          .notFound()
-          .build());
+          .getStudentFaculty(id)
+          .map(ResponseEntity::ok)
+          .orElse(ResponseEntity
+            .notFound()
+            .build());
     }
 
     @PutMapping("/{studentId}/assign/{facultyId}")
@@ -105,10 +105,19 @@ public class StudentController {
     }
 
     @GetMapping("/try-to-optim")
-    public ResponseEntity <Integer> getOptimaFormula() {
+    public ResponseEntity<Integer> getOptimaFormula() {
         int sum = IntStream.rangeClosed(1, 1_000_000).parallel().sum();
         return ResponseEntity.ok(sum);
     }
 
+    @GetMapping("print-parallel")
+    public ResponseEntity<String> printParallel() {
+        return ResponseEntity.ok(studentService.printParallelStudents());
+    }
+
+    @GetMapping("print-synchronized")
+    public ResponseEntity<String> printSynchronized() {
+        return ResponseEntity.ok(studentService.printSynchronizedStudents());
+    }
 
 }
