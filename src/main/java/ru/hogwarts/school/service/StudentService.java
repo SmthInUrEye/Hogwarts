@@ -132,5 +132,66 @@ public class StudentService {
           .mapToInt(Student::getAge)
           .average();
     }
+
+    public String printParallelStudents() {
+        List<Student> allStudents = studentRepository.findAll();
+
+        System.out.println("Main thread: " + Thread.currentThread().getName());
+        System.out.println("1:" + allStudents.get(1).getName());
+        System.out.println("2:" + allStudents.get(2).getName());
+
+        Thread thread1 = new Thread(() -> {
+            System.out.println("Second thread: " + Thread.currentThread().getName());
+            System.out.println("3:" + allStudents.get(3).getName());
+            System.out.println("4:" + allStudents.get(4).getName());
+        });
+
+        Thread thread2 = new Thread(() -> {
+            System.out.println("Third thread: " + Thread.currentThread().getName());
+            System.out.println("5:" + allStudents.get(5).getName());
+            System.out.println("6:" + allStudents.get(6).getName());
+        });
+
+        thread1.start();
+        thread2.start();
+
+        return "Print parallel is over";
+    }
+
+    public synchronized void printStudentName(int number, Student student) {
+        System.out.println(number + ": " + student.getName());
+    }
+
+    public String printSynchronizedStudents() {
+        List<Student> allStudents = studentRepository.findAll();
+
+        System.out.println("Main thread: " + Thread.currentThread().getName());
+        printStudentName(1, allStudents.get(1));
+        printStudentName(2, allStudents.get(2));
+
+        Thread thread1 = new Thread(() -> {
+            System.out.println("Second thread: " + Thread.currentThread().getName());
+            printStudentName(3, allStudents.get(3));
+            printStudentName(4, allStudents.get(4));
+        });
+
+        Thread thread2 = new Thread(() -> {
+            System.out.println("Third thread: " + Thread.currentThread().getName());
+            printStudentName(5, allStudents.get(5));
+            printStudentName(6, allStudents.get(6));
+        });
+
+        try {
+            thread1.start();
+            thread1.join();
+            thread2.start();
+            thread2.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        return "Print synchronized is over";
+    }
+
 }
 
